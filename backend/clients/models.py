@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 # Create your models here.
 class Client(models.Model):
     STATUS_CHOICES = [
@@ -18,13 +19,16 @@ class Client(models.Model):
     state = models.CharField(max_length=100, blank=True, null=True)
     zip_code = models.CharField(max_length=20, blank=True, null=True)
     country = models.CharField(max_length=100, blank=True, null=True)
-
     gstin = models.CharField(max_length=50, blank=True, null=True)
+
     status = models.CharField(
         max_length=10,
         choices=STATUS_CHOICES,
         default="Active"
     )
+
+    contractStartDate = models.DateTimeField(blank=True, null=True) 
+    contractEndDate = models.DateTimeField(blank=True, null=True) 
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -145,5 +149,23 @@ class ClientUnit(models.Model):
     nature_of_service = models.CharField(max_length=255, blank=True, null=True)
     rate_structure = models.CharField(max_length=255, blank=True, null=True)
 
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+
+        # First save to generate ID (only for new objects)
+        super().save(*args, **kwargs)
+
+        new_code = f"{self.client.client_code}-{slugify(self.unit_name)}-{self.id}".upper()
+
+        # If updating and code changed → store old code
+        if not is_new:
+            old_obj = ClientUnit.objects.get(pk=self.pk)
+            if old_obj.unit_code and old_obj.unit_code != new_code:
+                self.old_unit_code = old_obj.unit_code
+
+        # Update only if changed (avoid infinite loop)
+        if self.unit_code != new_code:
+            self.unit_code = new_code
+            super().save(update_fields=["unit_code", "old_unit_code"])
     def __str__(self):
         return f"{self.unit_name} ({self.unit_code})"

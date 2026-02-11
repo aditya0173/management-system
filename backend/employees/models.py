@@ -1,6 +1,6 @@
 from django.db import models
 
-class Gender:
+class Gender(models.TextChoices):
     MALE="Male"
     FEMALE="Female"
     OTHERS="Others"
@@ -29,7 +29,7 @@ class Employees(models.Model):
     position = models.CharField(max_length=250, null=True, blank=True)
     department = models.CharField(max_length=250, null=True, blank=True)
     hireDate = models.DateField()
-    salary = models.DecimalField(max_length=10,decimal_places=2)
+    salary = models.DecimalField(max_digits=10,decimal_places=2)
 
     # Models Property Feilds
     is_active = models.BooleanField(default=True)

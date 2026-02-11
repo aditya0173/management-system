@@ -114,6 +114,7 @@ urlpatterns = [
     # User Management API
     path("api/", include("users.urls")),  # Replace 'users' with your app name if different
     path("api/", include("clients.urls")),  # Replace 'users' with your app name if different
+    path("api/", include("employees.urls")),  # Replace 'users' with your app name if different
     
     # Add more app URLs here as needed
     # path("api/", include("another_app.urls")),
