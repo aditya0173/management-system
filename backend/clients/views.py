@@ -3,24 +3,20 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from .models import Client, ClientUnit, DepartmentContact
-from .serializers import (
-    ClientSerializer,
-    ClientUnitSerializer,
-    DepartmentContactSerializer,
-)
+from .serializers import ( ClientSerializer, ClientUnitSerializer, DepartmentContactSerializer,)
 
 
 class ClientViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.prefetch_related("units").all()
     serializer_class = ClientSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+    lookup_value_regex = r'\d+'
 
     def destroy(self, request, *args, **kwargs):
         """
         Deletes client and all related units automatically (CASCADE).
         """
         return super().destroy(request, *args, **kwargs)
-
 
 class ClientUnitViewSet(viewsets.ModelViewSet):
     queryset = ClientUnit.objects.select_related(
@@ -45,8 +41,7 @@ class ClientUnitViewSet(viewsets.ModelViewSet):
         serializer.save(client_id=client_id)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
+    
 class DepartmentContactViewSet(viewsets.ModelViewSet):
     queryset = DepartmentContact.objects.all()
     serializer_class = DepartmentContactSerializer

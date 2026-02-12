@@ -9,8 +9,8 @@ class Client(models.Model):
 
     company_name = models.CharField(max_length=255)
     client_code = models.CharField(max_length=100, unique=True)
-    contact_person = models.CharField(max_length=255)
-    email = models.EmailField()
+    contact_person = models.CharField(max_length=255,blank=True, null=True)
+    email = models.EmailField(blank=True, null=True)
     phone = models.CharField(max_length=50, blank=True, null=True)
 
     # Address
@@ -59,10 +59,10 @@ class ClientUnit(models.Model):
     unit_code = models.CharField(max_length=100)
     old_unit_code = models.CharField(max_length=100, blank=True, null=True)
     print_name = models.CharField(max_length=255, blank=True, null=True)
-    billing_name = models.CharField(max_length=255, blank=True, null=True)
 
     # Addresses
     shipping_address = models.TextField(blank=True, null=True)
+    billing_name = models.CharField(max_length=255, blank=True, null=True)
     billing_address = models.TextField(blank=True, null=True)
     billing_from_state = models.CharField(max_length=100, blank=True, null=True)
     billing_to_state = models.CharField(max_length=100, blank=True, null=True)
@@ -106,9 +106,8 @@ class ClientUnit(models.Model):
         DepartmentContact,
         related_name="accounts_for",
         on_delete=models.SET_NULL,
-        blank=True,
-        null=True
-    )
+        blank=True,null=True
+        )
     operation_department = models.OneToOneField(
         DepartmentContact,
         related_name="operations_for",
@@ -151,12 +150,9 @@ class ClientUnit(models.Model):
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
-
         # First save to generate ID (only for new objects)
         super().save(*args, **kwargs)
-
         new_code = f"{self.client.client_code}-{slugify(self.unit_name)}-{self.id}".upper()
-
         # If updating and code changed → store old code
         if not is_new:
             old_obj = ClientUnit.objects.get(pk=self.pk)

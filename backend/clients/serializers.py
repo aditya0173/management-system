@@ -62,7 +62,7 @@ class ClientUnitSerializer(serializers.ModelSerializer):
 
 
 class ClientSerializer(serializers.ModelSerializer):
-    units = ClientUnitSerializer(many=True)
+    units = ClientUnitSerializer(many=True, required=False)
 
     class Meta:
         model = Client
