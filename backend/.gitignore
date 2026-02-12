@@ -40,3 +40,8 @@ htmlcov/
 # Migrations (optional – many teams keep these)
 # */migrations/*
 # !*/migrations/__init__.py
+
+
+# temprory files 
+temp/
+temp/*
